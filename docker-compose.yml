@@ -1,0 +1,14 @@
+services:
+  brs-sim:
+    build: .
+    container_name: brs-sim
+    ports:
+      - "8080:8080"
+    environment:
+      - PROJECT_PATH=/app/projects
+      - PROJECT=hello-world
+      - FILE=source/main.brs
+      - PORT=8080
+    volumes:
+      - ./projects:/app/projects
+    working_dir: /app/projects/hello-world
