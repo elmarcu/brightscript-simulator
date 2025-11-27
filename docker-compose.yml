@@ -5,10 +5,13 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - PROJECT_PATH=/app/projects
-      - PROJECT=hello-world
-      - FILE=source/main.brs
-      - PORT=8080
+      PROJECT_PATH: "/app/projects"
+      PROJECT: "hello-world"
+      FILE: "main.bs"  # top-level entry point
+      PORT: 8080
     volumes:
-      - ./projects:/app/projects
-    working_dir: /app/projects/hello-world
+      # Mount projects for hot reload of source scripts
+      - ./projects:/app/projects:cached
+      # Mount server + public for hot reload
+      - ./server.js:/app/server.js:cached
+      - ./public:/app/public:cached

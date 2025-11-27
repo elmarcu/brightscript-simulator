@@ -1,16 +1,204 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8" />
+  <meta charset="UTF-8" />
   <title>BRS Simulator</title>
   <style>
-    body { background:#111; color:#0f0; font-family: monospace; padding:10px; }
-    pre { background:#000; padding:10px; height:60vh; overflow:auto; }
+    body {
+      font-family: monospace;
+      background: #1e1e1e;
+      color: #d4d4d4;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      margin-top: 0;
+    }
+    .controls {
+      margin-bottom: 20px;
+    }
+    button {
+      padding: 10px 20px;
+      background: #0e639c;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-family: monospace;
+      font-size: 1em;
+      margin-right: 10px;
+    }
+    button:hover {
+      background: #1177bb;
+    }
+    button:active {
+      background: #0a4d8c;
+    }
+    .container {
+      display: flex;
+      gap: 20px;
+    }
+    #out {
+      flex: 1;
+      background: #252526;
+      padding: 15px;
+      border-radius: 4px;
+      max-height: 40vh;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      border: 1px solid #3e3e42;
+    }
+    #files {
+      flex: 1;
+      background: #252526;
+      padding: 15px;
+      border-radius: 4px;
+      max-height: 40vh;
+      overflow-y: auto;
+      border: 1px solid #3e3e42;
+    }
+    .file-tab {
+      cursor: pointer;
+      padding: 10px;
+      margin-bottom: 5px;
+      background: #2d2d30;
+      border: 1px solid #3e3e42;
+      border-radius: 3px;
+    }
+    .file-tab.active {
+      background: #0e639c;
+      color: #fff;
+    }
+    #fileContent {
+      margin-top: 15px;
+      background: #1e1e1e;
+      padding: 10px;
+      border: 1px solid #3e3e42;
+      border-radius: 3px;
+      max-height: 35vh;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      font-size: 0.9em;
+    }
+    #output {
+      background: #252526;
+      padding: 15px;
+      border-radius: 4px;
+      max-height: 20vh;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      border: 1px solid #3e3e42;
+      margin-top: 20px;
+    }
+    .output-label {
+      color: #4ec9b0;
+      font-weight: bold;
+      margin-top: 20px;
+      margin-bottom: 10px;
+    }
+    h2 {
+      margin-top: 0;
+      font-size: 1.2em;
+      color: #4ec9b0;
+    }
   </style>
 </head>
 <body>
-  <h1>BrightScript Output</h1>
-  <pre id="output">Connecting...\n</pre>
-  <script src="/client.js"></script>
+  <h1>🌐 BrightScript Simulator</h1>
+  
+  <div class="controls">
+    <button onclick="executeCode()">▶️ Execute</button>
+    <button onclick="clearLog()">🗑️ Clear Log</button>
+  </div>
+
+  <div class="container">
+    <div style="flex: 1;">
+      <h2>Build Log</h2>
+      <div id="out">Connecting...</div>
+      
+      <div class="output-label">Execution Output</div>
+      <div id="output"></div>
+    </div>
+    
+    <div style="flex: 1;">
+      <h2>Compiled Files</h2>
+      <div id="files"></div>
+      <div id="fileContent"></div>
+    </div>
+  </div>
+
+  <script>
+    const out = document.getElementById("out");
+    const filesDiv = document.getElementById("files");
+    const fileContent = document.getElementById("fileContent");
+    const outputDiv = document.getElementById("output");
+    let files = {};
+
+    const evt = new EventSource("/events");
+
+    evt.onmessage = e => {
+      out.textContent += "\n" + e.data;
+      window.scrollTo(0, document.body.scrollHeight);
+      
+      // Refresh file list after build completes
+      if (e.data.includes("Build completed")) {
+        loadFiles();
+      }
+    };
+
+    evt.onerror = () => {
+      out.textContent += "\n[Disconnected]";
+    };
+
+    async function loadFiles() {
+      try {
+        const res = await fetch("/compiled-files");
+        files = await res.json();
+        renderFileList();
+      } catch (err) {
+        filesDiv.textContent = `[ERROR] Failed to load files: ${err.message}`;
+      }
+    }
+
+    function renderFileList() {
+      filesDiv.innerHTML = Object.keys(files).map(name => 
+        `<div class="file-tab" onclick="showFile('${name}')">${name}</div>`
+      ).join("");
+    }
+
+    function showFile(name) {
+      document.querySelectorAll(".file-tab").forEach(t => t.classList.remove("active"));
+      event.target?.classList.add("active");
+      
+      const content = files[name];
+      fileContent.textContent = content;
+    }
+
+    async function executeCode() {
+      outputDiv.textContent = "Executing...";
+      try {
+        const res = await fetch("/execute");
+        const data = await res.json();
+        if (res.ok) {
+          outputDiv.textContent = data.output || "[No output]";
+        } else {
+          outputDiv.textContent = `[ERROR] ${data.error}`;
+        }
+      } catch (err) {
+        outputDiv.textContent = `[ERROR] ${err.message}`;
+      }
+    }
+
+    function clearLog() {
+      out.textContent = "";
+      outputDiv.textContent = "";
+    }
+
+    // Load files on startup
+    loadFiles();
+  </script>
 </body>
 </html>

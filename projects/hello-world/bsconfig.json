@@ -1,0 +1,15 @@
+{
+  "emitFiles": true,
+  "files": ["source/**/*.bs", "source/**/*.brs"],
+  "sourceDirs": ["source"],
+  "entryPoints": [
+    "source/main.bs"
+  ],
+  "exclude": ["dist/**", "node_modules/**"],
+  "createPackage": false,
+  "retainStagingDir": true,
+  "stagingDir": "dist",
+  "diagnosticFilters": [
+    { "code": 1013, "severity": "hint" }
+  ]
+}

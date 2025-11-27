@@ -1,0 +1,7 @@
+namespace Greet
+
+function Greet_Hello(name as string)
+    print "Hello " + name
+end function
+
+end namespace
