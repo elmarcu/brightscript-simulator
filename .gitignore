@@ -1,1 +1,33 @@
-node_modules
+.DS_Store
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build / output
+dist/
+**/dist/
+*.tgz
+
+# BrighterScript / staging
+*.brs
+*.brs.map
+
+# Environment
+.env
+.env.*
+
+# Editor files
+.vscode/
+*.sublime-workspace
+*.sublime-project
+
+# macOS
+.DS_Store
+
+# Logs
+*.log
+
+# Optional: ignore Docker artifacts
+docker-compose.override.ymlnode_modules
