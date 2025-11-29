@@ -1,0 +1,84 @@
+sub main() as void
+    print "=== Hello Screen Demo ==="
+    print "Creating scene..."
+    
+    ' Initialize scene with properties
+    scene = CreateHelloScene()
+    
+    print "Scene created and ready"
+    print "Message: " + scene.message
+    print ""
+    print "=== Scene Elements ==="
+    RenderScene(scene)
+end sub
+
+function CreateHelloScene() as object
+    scene = {
+        message: "Welcome to BrightScript UI Demo!"
+        colors: {
+            background: "#1a1a1a"
+            text: "#ffffff"
+            accent: "#00a8ff"
+        }
+        elements: [
+            {
+                type: "Label"
+                text: "Hello Screen"
+                x: 100
+                y: 100
+                color: "#00a8ff"
+                fontSize: 24
+            }
+            {
+                type: "Label"
+                text: "Welcome to BrightScript UI Demo!"
+                x: 100
+                y: 150
+                color: "#ffffff"
+                fontSize: 16
+            }
+            {
+                type: "Button"
+                text: "Start"
+                x: 100
+                y: 200
+                width: 200
+                height: 50
+                color: "#00a8ff"
+            }
+        ]
+    }
+    
+    return scene
+end function
+
+function RenderScene(scene as object) as void
+    print "┌" + string(50, "─") + "┐"
+    print "│ " + CenterText(scene.message, 48) + " │"
+    print "├" + string(50, "─") + "┤"
+    
+    for each element in scene.elements
+        if element.type = "Label"
+            print "│ " + element.text
+        else if element.type = "Button"
+            print "│ ╔" + string(element.width, "═") + "╗"
+            print "│ ║ " + CenterText(element.text, element.width - 2) + " ║"
+            print "│ ╚" + string(element.width, "═") + "╝"
+        end if
+    end for
+    
+    print "└" + string(50, "─") + "┘"
+end function
+
+function CenterText(text as string, width as integer) as string
+    textLen = len(text)
+    if textLen >= width
+        return left(text, width)
+    end if
+    
+    padding = (width - textLen) / 2
+    leftPad = string(padding, " ")
+    rightPad = string(width - textLen - padding, " ")
+    
+    return leftPad + text + rightPad
+end function

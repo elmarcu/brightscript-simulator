@@ -7,6 +7,7 @@ services:
     environment:
       PROJECT_PATH: "/app/projects"
       PROJECT: "hello-world"
+      #PROJECT: "hello-screen"
       FILE: "main.bs"  # top-level entry point
       PORT: 8080
     volumes:
